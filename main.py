@@ -9,15 +9,17 @@ from flask_login import login_user, LoginManager, current_user, logout_user, log
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
 from functools import wraps
-import bleach
+from bleach import clean
+from dotenv import load_dotenv
 
 from db import db
 from models import User, BlogPost, Comment
 
+load_dotenv()
 
 # config flask
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "6da8d3d38935f8754042a174198141c8")
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
@@ -76,7 +78,7 @@ def strip_invalid_html(content: str) -> str:
         'a': ['href', 'target', 'title'],
         'img': ['src', 'alt', 'width', 'height'],
     }
-    cleaned_content = bleach.clean(content,
+    cleaned_content = clean(content,
                                    tags=allowed_tags,
                                    attributes=allowed_attrs,
                                    strip=True)
